@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+<input id = "file" type="file" onchange="myFunction()"/>
+
+<button onclick="myfunction()">cut</button>
+<button onclick="stop()">stop</button>
+
+<script>
+
+     const audiocontext= new AudioContext();
+     var source;
+      let music;
+let chunk=[];
+let mediaRecorder;
+     function myfunction(){
+        let myPromise = new Promise(function(resolve, reject) {
+       
+            var x = source.buffer.getChannelData(0);
+            source.stop();
+        source.disconnect();
+
+     
+  // var y = x.slice(10*source.buffer.sampleRate, 20*source.buffer.sampleRate);
+
+   var counter = 0;
+var array = new Float32Array(10*48000);
+while(counter<480000){
+
+    array[counter] = x[counter];
+    counter++;
+    
+}
+resolve(new Float32Array(array));
+reject("error")
+});
+
+   myPromise.then((data)=>{
+
+
+var audiobuffer = audiocontext.createBuffer(1, data.length, audiocontext.sampleRate)
+ var ab1=  audiobuffer.getChannelData(0);
+ ab1.set(data);
+ source = audiocontext.createBufferSource();
+      source.buffer=audiobuffer;
+      source.connect(audiocontext.destination);
+      source.start(0);
+
+      const mediaStreamDestination = audiocontext.createMediaStreamDestination();
+source.connect(mediaStreamDestination);
+ mediaRecorder = new MediaRecorder(mediaStreamDestination.stream);
+mediaRecorder.start();
+
+
+
+
+mediaRecorder.ondataavailable = e => {
+
+    chunk.push(e.data);
+}
+
+   })
+
+}
+
+function myFunction() {
+ 
+
+  const fr = new FileReader();
+
+  fr.onload = function(){
+    music = fr.result;
+    audiocontext.decodeAudioData(fr.result, function(audiofile){
+        source = audiocontext.createBufferSource();
+        source.buffer=audiofile;
+        source.connect(audiocontext.destination);
+        source.start(0);
+        
+     
+    })
+  }
+
+ var Files= document.getElementById("file").files
+  fr.readAsArrayBuffer(Files[0]);
+}
+
+function stop(){
+
+    mediaRecorder.stop();
+    source.stop();
+
+    console.log(chunk);
+
+
+    mediaRecorder.onstop = (e) => {
+  console.log("data available after MediaRecorder.stop() called.");
+
+  const audio = document.createElement("audio");
+  audio.controls = true;
+  const blob = new Blob(chunk, { type: "audio/ogg; codecs=opus" });
+  const audioURL = window.URL.createObjectURL(blob);
+  audio.src = audioURL;
+ audio.id="audiofile"
+ if (document.contains(document.getElementById("audiofile"))) {
+            document.getElementById("audiofile").remove();
+}  
+        document.body.appendChild(audio);  
+
+
+  var a = document.createElement("a");
+  a.href = audioURL;
+  a.download = "downloaded.ogg";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+};
+}
+
+</script>
+</body>
+</html>
