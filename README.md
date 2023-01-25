@@ -1,5 +1,2 @@
 # Audio-trimming-in-plain-javaScript
-This is audio trimming app in plain javaScript, HTML and CSS. This app will trim the first 10 seconds of your audio.
-you can check index.html from the src folder. Here you will find all the code. The server.js file is used to run the index.html at localhost:3000. Use an imput audio more than 
-10 Second. The app will trim the first 10 second from the audio. The trimming values are hard coded. When you click on cut button the audio will start recording automatically. 
-After clicking on the stop button the recording will stop and audio will be downloaded.
+This is a simple audio trimming application built using plain JavaScript, HTML, and CSS. It trims the first 10 seconds of an audio file and allows the user to record and download the trimmed audio. The user can run the app locally by using the server.js file and accessing it at localhost:3000. The trimming is done using channel data and the trimming values are hardcoded. The app automatically starts recording after the "cut" button is clicked and stops recording when the "stop" button is clicked.
